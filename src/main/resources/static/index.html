@@ -1,0 +1,228 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Plagiarism Analysis Portal</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 40px; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 900px; margin: auto; }
+        .terminal { background: #1e1e1e; color: #4af626; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; height: 180px; overflow-y: auto; margin: 20px 0; font-size: 13px; white-space: pre-wrap; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #f8f9fa; padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6; }
+        td { padding: 12px; border-bottom: 1px solid #dee2e6; }
+        .badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .high { background: #ffebee; color: #c62828; }
+        .low { background: #e8f5e9; color: #2e7d32; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>🔍 Plagiarism Analysis Portal</h2>
+    <p>Upload a ZIP file containing Java source files.</p>
+    <input type="file" id="zipFile" accept=".zip">
+    <button onclick="startAnalysis()" style="background:#28a745; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold;">Run Audit</button>
+
+    <div class="terminal" id="logBox">System ready. Awaiting upload...</div>
+
+    <div id="resultSection" style="display:none;">
+        <hr>
+        <h3>Audit Summary</h3>
+        <table id="resTable">
+            <thead><tr><th>Comparison Pair</th><th>Similarity</th><th>Risk Level</th></tr></thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    async function startAnalysis() {
+        const fileInput = document.getElementById('zipFile');
+        const logBox = document.getElementById('logBox');
+        const file = fileInput.files[0];
+        
+        if (!file) return alert("Please select a ZIP file");
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        logBox.innerText = "> Initializing...\n> Extracting Submissions...\n> Running JPlag Engine (this may take a moment)...";
+        document.getElementById('resultSection').style.display = 'none';
+
+        try {
+            const response = await fetch('/api/plagiarism/upload', { 
+                method: 'POST', 
+                body: formData 
+            });
+
+            if (!response.ok) throw new Error("Server error: " + response.statusText);
+
+            const data = await response.json();
+
+            // 1. Show Logs
+            logBox.innerText = data.detailedLogs.join('\n');
+            
+            // 2. Populate Table
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            if (data.peerMatches && Object.keys(data.peerMatches).length > 0) {
+                for (let [pair, score] of Object.entries(data.peerMatches)) {
+                    const isHigh = score > 50;
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${pair}</td>
+                            <td>${score.toFixed(2)}%</td>
+                            <td><span class="badge ${isHigh ? 'high' : 'low'}">${isHigh ? 'HIGH' : 'LOW'}</span></td>
+                        </tr>`;
+                }
+            } else {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">No significant similarities found.</td></tr>';
+            }
+            
+            document.getElementById('resultSection').style.display = 'block';
+            logBox.scrollTop = logBox.scrollHeight;
+
+        } catch (error) {
+            logBox.innerText += "\n\n[FATAL ERROR]: " + error.message;
+            console.error(error);
+        }
+    }
+</script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Plagiarism Analysis Portal</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 40px; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 900px; margin: auto; }
+        .terminal { background: #1e1e1e; color: #4af626; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; height: 200px; overflow-y: auto; margin: 20px 0; font-size: 13px; white-space: pre-wrap; border: 2px solid #333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #f8f9fa; padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6; }
+        td { padding: 12px; border-bottom: 1px solid #dee2e6; }
+        .badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .high { background: #ffebee; color: #c62828; }
+        .low { background: #e8f5e9; color: #2e7d32; }
+        .btn-report { background: #007bff; color: white; border: none; padding: 8px 18px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-report:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>🔍 Plagiarism Analysis Portal</h2>
+    <p>Upload a ZIP file containing student Java submissions.</p>
+    
+    <div style="margin-bottom: 20px;">
+        <input type="file" id="zipFile" accept=".zip">
+        <button onclick="startAnalysis()" style="background:#28a745; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold;">Run Audit</button>
+    </div>
+
+    <div class="terminal" id="logBox">> System ready. Awaiting upload...</div>
+
+    <div id="resultSection" style="display:none;">
+        <hr>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+            <h3 style="margin:0;">Audit Summary</h3>
+            <div id="reportButtonContainer"></div>
+        </div>
+        <table id="resTable">
+            <thead>
+                <tr>
+                    <th>Comparison Pair</th>
+                    <th>Similarity</th>
+                    <th>Risk Level</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    async function startAnalysis() {
+        const fileInput = document.getElementById('zipFile');
+        const logBox = document.getElementById('logBox');
+        const file = fileInput.files[0];
+        
+        if (!file) return alert("Please select a ZIP file");
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        // Reset UI
+        logBox.innerText = "> Initializing...\n> Extracting Submissions...\n> Running JPlag Engine (this may take a moment)...";
+        document.getElementById('resultSection').style.display = 'none';
+        document.getElementById('reportButtonContainer').innerHTML = '';
+
+        try {
+            const response = await fetch('/api/plagiarism/upload', { 
+                method: 'POST', 
+                body: formData 
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || "Server error");
+            }
+
+            const data = await response.json();
+
+            // 1. Show Logs
+            logBox.innerText = data.detailedLogs ? data.detailedLogs.join('\n') : "No logs available.";
+            
+            // 2. Add View Report Button
+            if (data.jobId) {
+                document.getElementById('reportButtonContainer').innerHTML = `
+                    <button class="btn-report" onclick="openJPlagViewer('${data.jobId}')">
+                        🔍 Open Interactive JPlag Report
+                    </button>`;
+            }
+
+            // 3. Populate Table
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            const matches = data.peerMatches;
+            if (matches && Object.keys(matches).length > 0) {
+                for (let [pair, score] of Object.entries(matches)) {
+                    const isHigh = score > 50;
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${pair}</td>
+                            <td>${parseFloat(score).toFixed(2)}%</td>
+                            <td><span class="badge ${isHigh ? 'high' : 'low'}">${isHigh ? 'HIGH' : 'LOW'}</span></td>
+                        </tr>`;
+                }
+            } else {
+                tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">No significant similarities found.</td></tr>';
+            }
+            
+            document.getElementById('resultSection').style.display = 'block';
+            logBox.scrollTop = logBox.scrollHeight;
+
+        } catch (error) {
+            logBox.innerText += "\n\n[FATAL ERROR]: " + error.message;
+            alert("Analysis failed: " + error.message);
+        }
+    }
+
+    async function openJPlagViewer(jobId) {
+        try {
+            const res = await fetch(`/api/plagiarism/view-report?jobId=${jobId}`);
+            if (res.ok) {
+                alert("Opening the interactive JPlag report on the server...");
+            } else {
+                alert("Failed to open report viewer. Check if the job directory exists.");
+            }
+        } catch (err) {
+            console.error("Error:", err);
+        }
+    }
+</script>
+</body>
+</html>

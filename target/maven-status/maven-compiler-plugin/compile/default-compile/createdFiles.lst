@@ -1,0 +1,6 @@
+com\project\model\PlagiarismResponse.class
+com\project\service\FileService.class
+com\project\service\JPlagService.class
+com\project\controller\PlagiarismController.class
+com\project\storage\StorageService.class
+com\project\PlagiarismApplication.class
