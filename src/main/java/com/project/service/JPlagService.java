@@ -553,7 +553,7 @@ public class JPlagService {
         List<String> logs = new ArrayList<>();
         Map<String, Double> similarityMap = new HashMap<>();
 
-        // ✅ Clean + prepare files
+        //Clean + prepare files
         prepareFiles(submissionsDir);
 
         File reportFile = new File("jplag-output-" + jobId + ".jplag");
@@ -590,7 +590,7 @@ public class JPlagService {
             throw new Exception("JPlag failed or timed out");
         }
 
-        // ✅ Extract results
+        // Extract results
         if (reportFile.exists()) {
             extractResults(reportFile, similarityMap);
         }
@@ -606,7 +606,7 @@ public class JPlagService {
         );
     }
 
-    // ✅ FIXED FILE PREPARATION
+    //FIXED FILE PREPARATION
     private void prepareFiles(File root) throws IOException {
 
         Files.walk(root.toPath())
@@ -638,39 +638,7 @@ public class JPlagService {
                 });
     }
 
-    // ✅ Extract JSON properly
-//     private void extractResults(File zipFile, Map<String, Double> map) {
-
-//     try (ZipFile zip = new ZipFile(zipFile)) {
-
-//         ZipEntry entry = zip.getEntry("results.json");
-//         if (entry == null) return;
-
-//         try (InputStream is = zip.getInputStream(entry)) {
-
-//             JsonNode root = mapper.readTree(is);
-
-//             // ✅ FIXED KEY
-//             JsonNode comparisons = root.get("submissionComparisons");
-
-//             if (comparisons != null && comparisons.isArray()) {
-
-//                 for (JsonNode comp : comparisons) {
-
-//                     String s1 = comp.get("firstSubmission").asText();
-//                     String s2 = comp.get("secondSubmission").asText();
-
-//                     double similarity = comp.get("similarity").asDouble();
-
-//                     map.put(s1 + " vs " + s2, similarity * 100);
-//                 }
-//             }
-//         }
-
-//     } catch (Exception e) {
-//         System.err.println("Error parsing results: " + e.getMessage());
-//     }
-// }
+    
 private void extractResults(File zipFile, Map<String, Double> map) {
 
     try (ZipFile zip = new ZipFile(zipFile)) {
@@ -682,7 +650,7 @@ private void extractResults(File zipFile, Map<String, Double> map) {
 
             System.out.println("ENTRY FOUND: " + entry.getName());
 
-            // ✅ CASE 1: Individual comparison files (MAIN SOURCE)
+            // CASE 1: Individual comparison files (MAIN SOURCE)
             if (entry.getName().contains("comparisons/") && entry.getName().endsWith(".json")) {
 
                 try (InputStream is = zip.getInputStream(entry)) {
@@ -699,14 +667,14 @@ private void extractResults(File zipFile, Map<String, Double> map) {
 
                         double similarity = root.get("similarities").get("AVG").asDouble();
 
-                        System.out.println("✅ MATCH FOUND: " + s1 + " vs " + s2 + " = " + similarity);
+                        System.out.println("MATCH FOUND: " + s1 + " vs " + s2 + " = " + similarity);
 
                         map.put(s1 + " vs " + s2, similarity * 100);
                     }
                 }
             }
 
-            // ✅ CASE 2: topComparisons.json (backup / summary)
+            // CASE 2: topComparisons.json (backup / summary)
             else if (entry.getName().equals("topComparisons.json")) {
 
                 try (InputStream is = zip.getInputStream(entry)) {
@@ -725,7 +693,7 @@ private void extractResults(File zipFile, Map<String, Double> map) {
 
                             double similarity = comp.get("similarities").get("AVG").asDouble();
 
-                            System.out.println("🔥 TOP MATCH: " + s1 + " vs " + s2 + " = " + similarity);
+                            System.out.println("TOP MATCH: " + s1 + " vs " + s2 + " = " + similarity);
 
                             map.put(s1 + " vs " + s2, similarity * 100);
                         }
@@ -735,7 +703,7 @@ private void extractResults(File zipFile, Map<String, Double> map) {
         }
 
     } catch (Exception e) {
-        System.err.println("❌ Error parsing results: " + e.getMessage());
+        System.err.println("Error parsing results: " + e.getMessage());
         e.printStackTrace();
     }
 }

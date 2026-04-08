@@ -452,7 +452,7 @@ class JPlagServiceTest {
         MockitoAnnotations.openMocks(this); // initialize mocks
     }
 
-    // 1️⃣ Happy path
+    //  Happy path
     @Test
     @DisplayName("1. Happy Path: runJPlag returns expected results")
     void testRunJPlagHappyPath() throws Exception {
@@ -477,7 +477,7 @@ class JPlagServiceTest {
         assertEquals(85.0, matches.get("A.java vs B.java"));
     }
 
-    // 2️⃣ Exception handling
+    // Exception handling
     @Test
     @DisplayName("2. Error Handling: runJPlag throws exception")
     void testRunJPlagException() throws Exception {
@@ -492,7 +492,7 @@ class JPlagServiceTest {
         assertEquals("Directory not found", ex.getMessage());
     }
 
-    // 3️⃣ Dirty data simulation (no valid files)
+    // Dirty data simulation (no valid files)
     @Test
     @DisplayName("3. Dirty Data: simulate no valid Java files")
     void testDirtyDataSimulation() throws Exception {
@@ -507,7 +507,7 @@ class JPlagServiceTest {
         assertEquals("No valid submissions", ex.getMessage());
     }
 
-    // 4️⃣ Single submission edge case
+    // Single submission edge case
     @Test
     @DisplayName("4. Single submission: should fail")
     void testSingleSubmissionSimulation() throws Exception {
@@ -522,7 +522,7 @@ class JPlagServiceTest {
         assertEquals("Not enough submissions", ex.getMessage());
     }
 
-    // 5️⃣ Timeout protection
+    // Timeout protection
     @Test
     @DisplayName("5. Timeout: runJPlag should complete within 30 seconds")
     void testRunJPlagTimeout() throws Exception {
@@ -535,7 +535,7 @@ class JPlagServiceTest {
                 jPlagServiceMock.runJPlag(submissions, "timeout-test", false));
     }
 
-    // 6️⃣ Parallel execution simulation
+    // Parallel execution simulation
     @Test
     @DisplayName("6. Parallel Execution: multiple calls safely")
     void testRunJPlagParallel() throws Exception {
