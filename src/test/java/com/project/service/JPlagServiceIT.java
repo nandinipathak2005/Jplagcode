@@ -244,7 +244,7 @@ class JPlagServiceTestIT {
         File submissions = new File("src/test/resources/single");
 
         assertThrows(Exception.class, () -> {
-            // Added 'false' as the 3rd argument
+            
             jPlagService.runJPlag(submissions, "single-test", false);
         });
     }
@@ -261,7 +261,7 @@ class JPlagServiceTestIT {
 
         Thread t1 = new Thread(() -> {
             try {
-                // Added 'false' as the 3rd argument
+                
                 jPlagService.runJPlag(submissions, "job1", false);
                 completed[0] = true;
             } catch (Exception ignored) {}
@@ -269,7 +269,7 @@ class JPlagServiceTestIT {
 
         Thread t2 = new Thread(() -> {
             try {
-                // Added 'false' as the 3rd argument
+                
                 jPlagService.runJPlag(submissions, "job2", false);
                 completed[1] = true;
             } catch (Exception ignored) {}
